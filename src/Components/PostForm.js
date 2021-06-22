@@ -1,66 +1,61 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 
-class PostForm extends Component {
-  state = {
-    title: "",
-    body: "",
-  }
+const PostForm = () => {
+  const [post, setPost] = useState({ title: "", body: "" });
+  const [loading, setLoading] = useState(false);
 
-  onChange = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
-  }
+  const handleChange = (e) => {
+    setPost({
+      ...post,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-  onSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    window.alert(JSON.stringify(this.state))
-    // const post = {
-    //   title: this.state.title,
-    //   body: this.state.body,
-    // };
+    setLoading(true);
+    fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(post),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLoading(false);
+      });
+  };
 
-    // fetch("https://jsonplaceholder.typicode.com/posts", {
-    //   method: "POST",
-    //   headers: {
-    //     "content-type": "application/json",
-    //   },
-    //   body: JSON.stringify(this.state),
-    // })
-    //   .then((res) => res.json())
-    //   .then(data => console.log(data));
-  }
-
-  render() {
-    return (
-      <div>
-        <h1> Add Post </h1>
-        <form onSubmit={this.onSubmit}>
-
-          <div>
-            <label> Title: </label>
-            <br />
-            <input
-              type="text"
-              name="title"
-              onChange={this.onChange}
-              value={this.state.title}
-            />
-          </div>
+  return (
+    <div>
+      <h1> Add Post </h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label> Title: </label>
           <br />
-          <div>
-            <label> Body: </label>
-            <br />
-            <textarea
-              name="body"
-              onChange={this.onChange}
-              value={this.state.body}
-            />
-          </div>
+          <input
+            type="text"
+            name="title"
+            onChange={handleChange}
+            value={post.title}
+          />
+        </div>
+        <br />
+        <div>
+          <label> Body: </label>
           <br />
+          <textarea name="body" onChange={handleChange} value={post.body} />
+        </div>
+        <br />
+        {loading ? (
+          <div>Saving....</div>
+        ) : (
           <button type="submit"> Submit</button>
-        </form>
-      </div>
-    );
-  }
-}
+        )}
+      </form>
+    </div>
+  );
+};
 
 export default PostForm;

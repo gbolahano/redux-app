@@ -1,42 +1,36 @@
-import React, { Component } from "react";
-// import { connect } from 'react-redux';
-// import { fetchPosts } from '../actions/postActions';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPosts } from "../actions/postActions";
 
-class Posts extends Component {
-  // No longer need constructor for state because it will be managed by redux(store/application state)
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     posts: [],
-  //   };
-  // }
-  // componentDidMount() {
-  //   fetch("https://jsonplaceholder.typicode.com/posts")
-  //     .then((res) => res.json()) // handling the promise from fetch, mapping the result to json
-  //     .then((data) => this.setState({ posts: data })); // Filling/Setting the posts with data that comes in
-  // }
+const Posts = () => {
+  // utilize useDispatch hook to dispatch and action
+  // utilize useSelector hook to select data from state
+  // instead of using connect() which is a higher order function
+  const dispatch = useDispatch();
+  const posts = useSelector((state) => state.posts);
 
-  // componentDidMount(){
-  //   // this.props.fetchPosts();
-  //   // console.log(this.props);
-  // }
+  // Similar to componentDidMount but uses React Hooks
+  useEffect(() => {
+    dispatch(fetchPosts());
+  }, [dispatch]);
 
-  render() {
-      // const postItems = this.state.posts.map( post => (
-      //     <div key={post.id}>
-      //         <h3>{post.title}</h3>
-      //         <p>{post.body}</p>
-      //     </div> // need a unique key to loop through something
-      // ))
-    return (
+  const postItems = () => {
+    if (posts.loading) {
+      return <div>Loading</div>;
+    }
+    // return first five posts
+    // if you remove .slice(0, 5) it'll return 100 posts
+    return posts.items.slice(0, 5).map((post) => (
       <div>
-        <h1> Posts </h1>
-        {/* {postItems} */}
+        <h3>{post.title}</h3>
       </div>
-    );
-  }
-}
-// const
-
-// export default connect(null, { fetchPosts })(Posts);
+    ));
+  };
+  return (
+    <div>
+      <h1> Posts </h1>
+      {postItems()}
+    </div>
+  );
+};
 export default Posts;
